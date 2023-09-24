@@ -16,7 +16,7 @@ Please note that this project's Hadoop part is built on top of [Big Data Europe]
 
 ## Quick Start
 
-If you using Linux run below bash code below,
+If you using Linux run below bash script,
 And If you Windows user you can download git and use git bash in the build context of the project.
 To start the cluster simply run:
 ```
