@@ -1,34 +1,41 @@
-# Data Engineering Project
-![Comp 1 (1)](https://github.com/Mouhamed-Jinja/Hadoop-Docker-Spark-Sql-Hive-Data-Integration-and-Warehousing-Project/assets/132110499/bd15a965-eb32-4422-bf9d-f63816cf5bf4)
+# Docker Hadoop Workbench
 
-
-A Hadoop cluster based on Docker, including SQL-Server, Jupyter, Hive, and Spark.
+A Hadoop cluster based on Docker, including Hive and Spark.
 
 ## Introduction
 This repository uses [Docker Compose](https://docs.docker.com/compose/) to initialize a Hadoop cluster including the following:
 
 - Hadoop
-- SQL Server
-- Jupyter
 - Hive
 - Spark
 
-Please note that this project's Hadoop part is built on top of [Big Data Europe](https://github.com/big-data-europe) works. Please check their [Docker Hub](https://hub.docker.com/u/bde2020/) for the latest images.
+Please note that this project is built on top of [Big Data Europe](https://github.com/big-data-europe) works. Please check their [Docker Hub](https://hub.docker.com/u/bde2020/) for latest images.
 
+This project is based on the following Docker versions:
+```
+Client:
+ Version:           20.10.2
+Server: Docker Engine - Community
+ Engine:
+  Version:          20.10.6
+docker-compose version 1.29.1, build c34c88b2
+```
 
 ## Quick Start
 
-If you using Linux run below bash script,
-And If you Windows user you can download git and use git bash in the build context of the project.
 To start the cluster simply run:
+
 ```
 ./start_demo.sh
 ```
-- Please make sure that you run this bash script because it copies the configuration file to the containers not just up the docker-compose.
 
+Alternatively, you can use `v2`, which is built on top of my own `spark-master` and `spark-history-server`:
 
-You can stop the cluster using:
- `./stop_demo.sh` 
+```
+./start_demo_v2.sh
+```
+
+You can stop the cluster using `./stop_demo.sh` or `./stop_demo_v2.sh`. Also you can modify `DOCKER_COMPOSE_FILE` in `start_demo.sh` and `stop_demo.sh` to use other YAML files.
 
 ## Interfaces
 
@@ -41,19 +48,30 @@ You can stop the cluster using:
 - Spark Master: http://localhost:8080/
 - Spark Worker: http://localhost:8081/
 - Spark Job WebUI: http://localhost:4040/ (only works when Spark job is running on `spark-master`)
+- Presto WebUI: http://localhost:8090/
 - Spark History Server：http://
 localhost:18080/
 
 ## Connections
 
+Use `hdfs dfs` to connect to `hdfs://localhost:9000/` (Please make sure you have [Hadoop](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html) installed first):
+
+```
+hdfs dfs -ls hdfs://localhost:9000/
+```
+
 Use Beeline to connect to HiveServer2 (Please make sure you have [Hive](https://cwiki.apache.org/confluence/display/Hive/AdminManual+Installation) installed first):
 
 ```
-beeline -u jdbc:hive2://localhost:10000/default -n hive -p hive
+beeline -u jdbc:hive2://localhost:10000/gold -n hive -p hive
+```
+
+- To submit spark job you can use:
+```
+spark-submit --jars /Drivers/SQL_Sever/jdbc/sqljdbc42.jar spark_job.py
 ```
 
 Use `spark-shell` to connect to Hive Metastore via thrift protocol (Please make sure you have [Spark](https://spark.apache.org/downloads.html) installed first):
-
 
 ```
 $ spark-shell
@@ -87,39 +105,72 @@ spark.sql("show databases").show
 import org.apache.spark.sql.SparkSession
 spark: org.apache.spark.sql.SparkSession = org.apache.spark.sql.SparkSession@1223467f
 ```
-- If you got an error that spak-shell not difined, you can use this code
+
+Use [Presto CLI](https://prestodb.io/docs/current/installation/cli.html) to connect to Presto and query Hive data:
+
+```bash
+wget https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.255/presto-cli-0.255-executable.jar
+mv presto-cli-0.255-executable.jar presto
+chmod +x presto
+./presto --server localhost:8090 --catalog hive --schema default
 ```
-docker exec -it spark-master spark/bin/spark-shell
+
+## Run MapReduce Job `WordCount`
+
+This part is based on [Big Data Europe's Hadoop Docker](https://github.com/big-data-europe/docker-hadoop) project.
+
+First run `hadoop-base` as a helper container:
+```bash
+docker run -d --network hadoop --env-file hadoop.env --name hadoop-base bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8 tail -f /dev/null
 ```
-if you got an error becuse can't find this dir :hdfs://namenode:9000/user/spark/applicationHistory
-you can create it by using :
+
+Then run the following:
+```bash
+docker exec -it hadoop-base hdfs dfs -mkdir -p /input/
+docker exec -it hadoop-base hdfs dfs -copyFromLocal -f /opt/hadoop-3.2.1/README.txt /input/
+docker exec -it hadoop-base mkdir jars
+docker cp jars/WordCount.jar hadoop-base:jars/WordCount.jar
+docker exec -it hadoop-base /bin/bash 
+hadoop jar jars/WordCount.jar WordCount /input /output
 ```
-hdfs dfs -mkdir -p hdfs://namenode:9000/user/spark/applicationHistory
-``` 
 
+You should be able to see the job in http://localhost:8088/cluster/apps and http://localhost:8188/applicationhistory (when finished).
 
-# Run Jobs
-Open Jupyter logs and use Jupyter-pyspark to run the jobs.
-- DimEmployee: create employee dimensions in side Hive DWH salesSchema,
-  by ingesting from SQL Server
-- DimCustomer
-- DimProduct
-- DimDate
-- FactSales
-You can add your databases in the build context file "DBs" and read it in the SQL server
-to apply your transformation
+After the job is finished, check the result:
+```bash
+hdfs dfs -cat /output/*
+```
 
-note: please while you read the tables from the database, make sure that you use the right
-SQL Server IP, you can inspect your sql server container and get the 
+Then type `exit` to exit the container.
 
+## Run Hive Job
 
+Make sure `hadoop-base` is running. Then prepare the data:
 
+```bash
+docker exec -it hadoop-base hdfs dfs -mkdir -p /test/
+docker exec -it hadoop-base mkdir test
+docker cp data hadoop-base:test/data
+docker exec -it hadoop-base /bin/bash
+hdfs dfs -put test/data/* /test/
+hdfs dfs -ls /test
+exit
+```
+
+Then create the table:
+```bash
+docker cp scripts/hive-beers.q hive-server:hive-beers.q
+docker exec -it hive-server /bin/bash
+cd /
+hive -f hive-beers.q
+exit
+```
 
 Then play with data using Beeline:
 ```
-beeline -u jdbc:hive2://localhost:10000/default -n hive -p hive
+beeline -u jdbc:hive2://localhost:10000/test -n hive -p hive
 
-0: jdbc:hive2://localhost:10000/default> show databases;
+0: jdbc:hive2://localhost:10000/test> select count(*) from beers;
 ```
 
 You should be able to see the job in http://localhost:8088/cluster/apps and http://localhost:8188/applicationhistory (when finished).
@@ -139,10 +190,33 @@ scala> spark.sql("show databases").show
 |     test|
 +---------+
 
-scala> spark.sql("USE brozeSalesSchema;")
+scala> val df = spark.sql("select * from test.beers")
+df: org.apache.spark.sql.DataFrame = [id: int, brewery_id: int ... 11 more fields]
 
-scala> spark.sql("Show tables;").show()
+scala> df.count
+res0: Long = 7822
 ```
+
+You should be able to see the Spark Shell session in http://localhost:8080/ and your job in http://localhost:4040/jobs/.
+
+If you encounter the following warning when running `spark-shell`:
+```
+WARN TaskSchedulerImpl: Initial job has not accepted any resources; check your cluster UI to ensure that workers are registered and have sufficient resources
+```
+Please check the logs of `spark-master` using `docker logs -f spark-master`. If the following exists, please restart your `spark-worker` using `docker-compose restart spark-worker`:
+```
+WARN Master: Got heartbeat from unregistered worker worker-20210622022950-xxx.xx.xx.xx-xxxxx. This worker was never registered, so ignoring the heartbeat.
+```
+
+Similarly, to run `spark-sql`, use `docker exec -it spark-master spark/bin/spark-sql`.
+
+## Run Spark Submit
+
+```bash
+docker exec -it spark-master /spark/bin/spark-submit --class org.apache.spark.examples.SparkPi /spark/examples/jars/spark-examples_2.12-3.1.1.jar 100
+```
+
+You should be able to see Spark Pi in http://localhost:8080/ and your job in http://localhost:4040/jobs/.
 
 ## Configuration Files
 
@@ -157,11 +231,3 @@ Some configuration file locations are listed below. The non-empty configuration 
   - `/etc/hadoop/mapred-site.xml` MAPRED_CONF
 - `hive-server`:
   - `/opt/hive/hive-site.xml` HIVE_CONF
-
-## there isupdates?
-yes, this project will be updated to add new data layers 
-- SilverSalesScheam : by filtering and applying business rules on the data
-- goldSalesSchema: to serve business logic and needs
-# Hadoop-Docker-Spark-Sql-Hive-Data-Integration-and-Warehousing-Project
-# Hadoop-Docker-Spark-Sql-Hive-Data-Integration-and-Warehousing-Project
-# Hadoop-Docker-Spark-Sql-Hive-Data-Integration-and-Warehousing-Project
