@@ -1,4 +1,6 @@
 # Data Engineering Project
+![Comp 1 (1)](https://github.com/Mouhamed-Jinja/Hadoop-Docker-Spark-Sql-Hive-Data-Integration-and-Warehousing-Project/assets/132110499/bd15a965-eb32-4422-bf9d-f63816cf5bf4)
+
 
 A Hadoop cluster based on Docker, including SQL-Server, Jupyter, Hive, and Spark.
 
