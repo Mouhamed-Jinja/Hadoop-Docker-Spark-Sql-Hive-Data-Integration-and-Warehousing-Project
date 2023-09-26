@@ -1,6 +1,5 @@
 # Data Engineering Project
-![Comp 1 (1)](https://github.com/Mouhamed-Jinja/Hadoop-Docker-Spark-Sql-Hive-Data-Integration-and-Warehousing-Project/assets/132110499/bd15a965-eb32-4422-bf9d-f63816cf5bf4)
-
+![Comp 1 (1)](https://github.com/Mouhamed-Jinja/Hadoop-Docker-Spark-Sql-Hive-Data-Integration-and-Warehousing-Project/assets/132110499/28f49870-fa31-4872-9fe5-7fe48de4fdcf)
 
 A Hadoop cluster based on Docker, including SQL-Server, Jupyter, Hive, and Spark.
 
@@ -50,6 +49,10 @@ Use Beeline to connect to HiveServer2 (Please make sure you have [Hive](https://
 
 ```
 beeline -u jdbc:hive2://localhost:10000/default -n hive -p hive
+```
+- To submit spark job you can use:
+```
+spark-submit --jars /Drivers/SQL_Sever/jdbc/sqljdbc42.jar spark_job.py
 ```
 
 Use `spark-shell` to connect to Hive Metastore via thrift protocol (Please make sure you have [Spark](https://spark.apache.org/downloads.html) installed first):
