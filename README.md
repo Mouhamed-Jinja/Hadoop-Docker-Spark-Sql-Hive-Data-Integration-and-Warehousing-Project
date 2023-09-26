@@ -50,6 +50,10 @@ Use Beeline to connect to HiveServer2 (Please make sure you have [Hive](https://
 ```
 beeline -u jdbc:hive2://localhost:10000/default -n hive -p hive
 ```
+- To submit spark job you can use:
+```
+spark-submit --jars /Drivers/SQL_Sever/jdbc/sqljdbc42.jar spark_job.py
+```
 
 Use `spark-shell` to connect to Hive Metastore via thrift protocol (Please make sure you have [Spark](https://spark.apache.org/downloads.html) installed first):
 
