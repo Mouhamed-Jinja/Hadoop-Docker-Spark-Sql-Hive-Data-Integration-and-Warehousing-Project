@@ -1,28 +1,12 @@
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
-
-spark = SparkSession.builder \
-    .appName("Employee") \
-    .config("hive.metastore.uris", "thrift://hive-metastore:9083") \
-    .config("spark.jars", "/Drivers/SQL_Sever/jdbc/sqljdbc42.jar")\
-    .enableHiveSupport() \
-    .getOrCreate()
+from sparkConfig import get_spark_session
+from sqlServerConnetor import sql_connector
+spark = get_spark_session("DimCustomer")
 
 Tables= ["[Sales].[Customer]", "[Person].[StateProvince]", "[Person].[BusinessEntityAddress]", "[Person].[Address]", "[Person].[Person]", "[HumanResources].[Department]", "[HumanResources].[EmployeeDepartmentHistory]", "[HumanResources].[Employee]"]
 print(len(Tables), " tables")
 
-dataFrames= {}
-for table in Tables:
-    query = f"select * from {table}"
-    df =spark.read.format("jdbc") \
-        .option("url", "jdbc:sqlserver://172.18.0.7:1433;databaseName=AdventureWorks2017") \
-        .option("driver", "com.microsoft.sqlserver.jdbc.SQLServerDriver") \
-        .option("dbtable", f"({query}) as temp") \
-        .option("user","sa") \
-        .option("password", "Mo*012105")\
-        .load()
-    dataFrames[table] = df
-print(dataFrames.keys())
+dataFrames = sql_connector(Tables)
 
 customer = dataFrames['[Sales].[Customer]']\
     .select('CustomerID',

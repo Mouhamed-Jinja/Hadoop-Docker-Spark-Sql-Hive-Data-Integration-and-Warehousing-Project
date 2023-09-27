@@ -1,8 +1,13 @@
 import sys
-sys.path.append('../')
-from Config.sparkConfig import get_spark_session
-sys.path.remove('../')
 
+# Add the path to the parent directory to sys.path
+sys.path.append('../')
+
+# Now you can import the module from the Config.sparkConfig package
+from Config.sparkConfig import get_spark_session
+
+# Remove the added path if needed (optional)
+sys.path.remove('../')
 from pyspark.sql.functions import *
 from Config.sparkConfig import get_spark_session
 from Config.sqlServerConnetor import sql_connector

@@ -1,0 +1,4 @@
+(base) jovyan@cf7f8ffd06ed:~/work/Spark_ETL_Scripts/selectedTables$ spark-submit sqlTables.py
+<class 'list'> 
+ ['[Person].[Person]', '[Production].[ProductCostHistory]', '[HumanResources].[Employee]', '[Production].[ProductCategory]', '[HumanResources].[Department]', '[HumanResources].[EmployeeDepartmentHistory]', '[Production].[Product]', '[Sales].[SalesOrderHeader]', '[Person].[Address]', '[Person].[StateProvince]', '[Person].[BusinessEntityAddress]', '[Production].[ProductModelProductDescriptionCulture]', '[Sales].[SalesOrderDetail]', '[Production].[ProductSubcategory]', '[Production].[ProductDescription]', '[Sales].[Customer]']
+16
