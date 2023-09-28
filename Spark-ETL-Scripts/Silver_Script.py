@@ -1,6 +1,6 @@
 from pyspark.sql.functions import *
 from ConfigAndConnectors.sparkConfig import get_spark_session
-from ConfigAndConnectors.hiveConnector import hive_connector
+from ConfigAndConnectors.hiveConnector import Write_In_Hive_Schema
 import SQL_QueriesAndAttributes.queries as query 
 
 spark= get_spark_session("silver-Stage")
@@ -42,11 +42,6 @@ DimDate.createOrReplaceTempView("DimDate")
 
 sliver_stage_tables =["DimCustomer", "DimEmployee", "DimProduct", "FactSales", "DimDate"]
 schemaName= "silver"
-#Writing Silver DWH
-for table in sliver_stage_tables:
-    df= spark.table(table)
-    hive_connector(schemaName,df,table)
-    print("___________writing_______________")
 
-    
-spark.sql("show tables").show()
+#Writing Silver DWH
+Write_In_Hive_Schema(schema="silver", TablesNamesList=sliver_stage_tables)

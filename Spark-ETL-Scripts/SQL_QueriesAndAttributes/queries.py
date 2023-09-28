@@ -183,3 +183,57 @@ fact_attributes= [
              'CarrierTrackingNumber',
              'LineTotal'
 ]
+
+
+silver_fact_attributes= [
+             'SalesOrderID',
+             "CustomerKey",
+             "EmployeeKey",
+             "ProductKey",
+             'RevisionNumber',
+             'OrderQty',
+             'UnitPrice',
+             'UnitPriceDiscount',
+             'SubTotal',
+             'TaxAmt',
+             'Freight',
+             'TotalDue',
+             'OrderDate',
+             'DueDate',
+             'ShipDate',
+             'Status',
+             'OnlineOrderFlag',
+             'SalesOrderNumber',
+             'PurchaseOrderNumber',
+             'AccountNumber',
+             'CreditCardApprovalCode',
+             'Comment',
+             'CarrierTrackingNumber',
+             'LineTotal'
+]
+
+silver_product_attributes =[
+        'ProductID',
+         'productName',
+         'ProductNumber',
+         'MakeFlag',
+         'FinishedGoodsFlag',
+         'Color',
+         'SafetyStockLevel',
+         'ReorderPoint',
+         'StandardCost',
+         'ListPrice',
+         'Size',
+         'SizeUnitMeasureCode',
+         'WeightUnitMeasureCode',
+         'Weight',
+         'DaysToManufacture',
+         'ProductLine',
+         'Class',
+         'Style',
+         'SellStartDate',
+         'SellEndDate',
+         'DiscontinuedDate',
+         'subCategoryName',
+         'Description'
+]

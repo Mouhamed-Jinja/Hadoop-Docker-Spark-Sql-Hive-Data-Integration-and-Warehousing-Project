@@ -1,5 +1,4 @@
 
-
 def get_spark_session(app_name):
     from pyspark.sql import SparkSession
     spark = SparkSession.builder \
