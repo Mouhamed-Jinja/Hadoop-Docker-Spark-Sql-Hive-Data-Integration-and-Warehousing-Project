@@ -12,8 +12,8 @@ customerColumns= query.customer_columns
 #we will build gold data layer based on silver layer.
 SchemaName= "silver"
 
-#df =haveNulls(columnsList=customerColumns,schema=SchemaName, dataFrameName="dimcustomer")
-#df.show()
+df =haveNulls(columnsList=customerColumns,schema=SchemaName, dataFrameName="dimcustomer")
+df.show()
 """
 +--------------------+--------------+
 |          CustomerID|             0|
@@ -43,14 +43,14 @@ DimCustomer= DimCustomer\
 
 DimCustomer.createOrReplaceTempView("DimCustomer")
 cols= DimCustomer.columns
-#print(cols)
+print(cols)
 
 
 #employee dimension
 DimEmployee =spark.table("silver.dimemployee")
 employeeColumns= query.employee_attributes
-#df =haveNulls(columnsList=employeeColumns,schema=SchemaName, dataFrameName="dimemployee")
-#df.show()
+df =haveNulls(columnsList=employeeColumns,schema=SchemaName, dataFrameName="dimemployee")
+df.show()
 """
 +-----------------+--------------+
 |      column name|count of nulls|
@@ -84,14 +84,14 @@ DimEmployee= DimEmployee\
 
 DimEmployee.createOrReplaceTempView("DimEmployee")
 cols =DimEmployee.columns
-#print(cols)
+print(cols)
 
 
 # Fact Sales: granularity is transactional level.
 FactSales=spark.table("silver.FactSales")
 factColumns= query.silver_fact_attributes
-#df =haveNulls(columnsList=factColumns,schema=SchemaName, dataFrameName="factsales")
-#df.show()
+df =haveNulls(columnsList=factColumns,schema=SchemaName, dataFrameName="factsales")
+df.show()
 FactSales = FactSales.drop(col("PurchaseOrderNumber"))
 FactSales.createOrReplaceTempView("FactSales")
 
@@ -100,8 +100,8 @@ FactSales.createOrReplaceTempView("FactSales")
 DimProduct =spark.table("silver.dimproduct")
 DimProduct.createOrReplaceTempView("DimProduct")
 productColumns= query.silver_product_attributes
-#df =haveNulls(columnsList=productColumns,schema=SchemaName, dataFrameName="dimproduct")
-#df.show()
+df =haveNulls(columnsList=productColumns,schema=SchemaName, dataFrameName="dimproduct")
+df.show()
 """
 +--------------------+--------------+
 |         column name|count of nulls|
