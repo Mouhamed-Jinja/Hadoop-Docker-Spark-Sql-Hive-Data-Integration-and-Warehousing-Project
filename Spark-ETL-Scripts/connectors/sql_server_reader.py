@@ -1,4 +1,4 @@
-from .sparkConfig import get_spark_session
+from .spark_session import get_spark_session
 spark = get_spark_session("sqlConnector")
 dataFrames= {}
 def sql_connector(Tables):

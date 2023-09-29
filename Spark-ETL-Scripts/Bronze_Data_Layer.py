@@ -1,8 +1,8 @@
 from pyspark.sql.functions import *
-from ConfigAndConnectors.sparkConfig import get_spark_session
-from ConfigAndConnectors.sqlServerConnetor import sql_connector
-from selectedTables.sqlTables import Bronze_Stage_Tables
-from ConfigAndConnectors.hiveConnector import hive_connector
+from connectors.spark_session import get_spark_session
+from connectors.sql_server_reader import sql_connector
+from sql_server_selected_tables.sql_tables import Bronze_Stage_Tables
+from connectors.hive_writer import hive_connector
 
 spark= get_spark_session("Bronze-Stage")
 Tables = Bronze_Stage_Tables

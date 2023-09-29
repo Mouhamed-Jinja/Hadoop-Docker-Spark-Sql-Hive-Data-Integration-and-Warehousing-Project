@@ -1,19 +1,19 @@
 from pyspark.sql.functions import *
-from ConfigAndConnectors.sparkConfig import get_spark_session
-from ConfigAndConnectors.hiveConnector import Write_In_Hive_Schema
-import SQL_QueriesAndAttributes.queries as query 
-from isnull import haveNulls
+from connectors.spark_session import get_spark_session
+from connectors.hive_writer import Write_In_Hive_Schema
+import sql_server_selected_columns.tables_attributes as attr
+from functions.isnull import haveNulls
 spark = get_spark_session("Gold_DWH")
 
 #check if customer dimension have nulls
 DimCustomer =spark.table("silver.dimcustomer")
-customerColumns= query.customer_columns
+customerColumns= attr.customer_columns
 
 #we will build gold data layer based on silver layer.
 SchemaName= "silver"
 
-df =haveNulls(columnsList=customerColumns,schema=SchemaName, dataFrameName="dimcustomer")
-df.show()
+#df =haveNulls(columnsList=customerColumns,schema=SchemaName, dataFrameName="dimcustomer")
+#df.show()
 """
 +--------------------+--------------+
 |          CustomerID|             0|
@@ -43,14 +43,14 @@ DimCustomer= DimCustomer\
 
 DimCustomer.createOrReplaceTempView("DimCustomer")
 cols= DimCustomer.columns
-print(cols)
+#print(cols)
 
 
 #employee dimension
 DimEmployee =spark.table("silver.dimemployee")
-employeeColumns= query.employee_attributes
-df =haveNulls(columnsList=employeeColumns,schema=SchemaName, dataFrameName="dimemployee")
-df.show()
+employeeColumns= attr.employee_attributes
+#df =haveNulls(columnsList=employeeColumns,schema=SchemaName, dataFrameName="dimemployee")
+#df.show()
 """
 +-----------------+--------------+
 |      column name|count of nulls|
@@ -84,14 +84,14 @@ DimEmployee= DimEmployee\
 
 DimEmployee.createOrReplaceTempView("DimEmployee")
 cols =DimEmployee.columns
-print(cols)
+#print(cols)
 
 
 # Fact Sales: granularity is transactional level.
 FactSales=spark.table("silver.FactSales")
-factColumns= query.silver_fact_attributes
-df =haveNulls(columnsList=factColumns,schema=SchemaName, dataFrameName="factsales")
-df.show()
+factColumns= attr.silver_fact_attributes
+#df =haveNulls(columnsList=factColumns,schema=SchemaName, dataFrameName="factsales")
+#df.show()
 FactSales = FactSales.drop(col("PurchaseOrderNumber"))
 FactSales.createOrReplaceTempView("FactSales")
 
@@ -99,9 +99,9 @@ FactSales.createOrReplaceTempView("FactSales")
 #_________Product Dimension____________
 DimProduct =spark.table("silver.dimproduct")
 DimProduct.createOrReplaceTempView("DimProduct")
-productColumns= query.silver_product_attributes
-df =haveNulls(columnsList=productColumns,schema=SchemaName, dataFrameName="dimproduct")
-df.show()
+productColumns= attr.silver_product_attributes
+#df =haveNulls(columnsList=productColumns,schema=SchemaName, dataFrameName="dimproduct")
+#df.show()
 """
 +--------------------+--------------+
 |         column name|count of nulls|

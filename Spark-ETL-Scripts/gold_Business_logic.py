@@ -1,6 +1,6 @@
 from pyspark.sql.functions import *
-from ConfigAndConnectors.sparkConfig import get_spark_session
-from ConfigAndConnectors.hiveConnector import Write_In_Hive_Schema
+from connectors.spark_session import get_spark_session
+from connectors.hive_writer import Write_In_Hive_Schema
 
 spark =get_spark_session("Business-Logic")
 spark.sql("USE gold")

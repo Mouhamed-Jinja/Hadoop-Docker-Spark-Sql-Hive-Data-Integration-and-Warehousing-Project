@@ -1,4 +1,4 @@
-from .sparkConfig import get_spark_session
+from .spark_session import get_spark_session
 spark =get_spark_session("hiveConnector")
 
 def Write_In_Hive_Schema(schema,TablesNamesList):
